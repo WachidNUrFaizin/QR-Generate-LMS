@@ -298,12 +298,16 @@ class HomeController extends GetxController {
         // QR Code
         // printer.printQRcode(rawValue.value, 200, 200, 1);
 
-        // generate image QR + 2 baris teks
+
+        final textLine1 = (scannedValue.value?['kp'] ?? 'LG').toString();
+        final hasGr = scannedValue.value?.containsKey('gr') ?? false;
+        final textLine2 = hasGr ? 'BM' : 'SA';
+
         final qrBytes = await generateQrWithText(
           data: rawValue.value,
-          textLine1: "LG", // baris 1 (2 karakter)
-          textLine2: "SA", // baris 2 (2 karakter)
-          qrSize: 150,     // sesuaikan jika ingin lebih besar/kecil
+          textLine1: textLine1,
+          textLine2: textLine2,
+          qrSize: 150,
         );
 
         // kirim ke printer (metode ini sesuai dengan library printer yang kamu pakai)

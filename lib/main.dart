@@ -9,6 +9,7 @@ void main() async {
   await GetStorage.init();
   runApp(
     GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       title: "Application",
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
