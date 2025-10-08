@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:lms_qr_generator/app/modules/home/views/riwayat_view.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../controllers/home_controller.dart';
 
@@ -10,6 +11,33 @@ class HomeView extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              // Header drawer
+              DrawerHeader(
+                decoration: BoxDecoration(color: Colors.white),
+                child: Center(child: Image.asset('assets/images/logo.png', width: 100)),
+              ),
+              ListTile(
+                leading: const Icon(Icons.home),
+                title: const Text('Beranda'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Get.toNamed('/scan'); // contoh pakai GetX route
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.history),
+                title: const Text('Riwayat'),
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => RiwayatPage()));
+                },
+              ),
+            ],
+          ),
+        ),
       appBar: AppBar(
         title: Text('LMS QR Generator', style: Get.textTheme.headlineSmall),
         actions: [

@@ -6,6 +6,8 @@ import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:lms_qr_generator/app/helper/scanned_helper.dart';
+import 'package:lms_qr_generator/app/models/scanned_model.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
@@ -228,6 +230,7 @@ class HomeController extends GetxController {
                       if(scannedValue.value!.containsKey('it') && scannedValue.value!.containsKey('nt') && scannedValue.value!.containsKey('at') && scannedValue.value!.containsKey('pt')) {
                         // valid
                         rawValue.value = value;
+                        insertScanned(scannedValue.value);
                         print(rawValue);
                         print(scannedValue.value!['pt']);
                         Get.back();
@@ -279,7 +282,21 @@ class HomeController extends GetxController {
       ),
     );
   }
-
+  Future<void> insertScanned(value) async {
+    try {
+      final scanned = ScannedItem(
+        it: value!["it"],
+        nt: value!["nt"],
+        at: value!["at"],
+        pt: value!["pt"],
+        date: DateTime.timestamp().toIso8601String(),
+      );
+      final id = await DatabaseHelper.instance.insertScanned(scanned);
+      print('ScannedItem inserted successfully with ID: $id');
+    } catch (e) {
+      print('Error inserting scanned item: $e');
+    }
+  }
   Future<void> printTicket() async {
     printer.isConnected.then((isConnected) async {
       if (isConnected == true) {
