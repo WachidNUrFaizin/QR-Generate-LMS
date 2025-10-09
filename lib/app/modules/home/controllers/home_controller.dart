@@ -300,25 +300,28 @@ class HomeController extends GetxController {
   Future<void> printTicket() async {
     printer.isConnected.then((isConnected) async {
       if (isConnected == true) {
-        // Judul
         printer.printCustom("ID CUSTOMER", 2, 1);
         printer.printNewLine();
 
-        // Format manual agar rapi di kertas 56mm
         printer.printCustom("ID        : ${scannedValue.value!["it"]}", 1, 0);
         printer.printCustom("Nama      : ${scannedValue.value!["nt"]}", 1, 0);
         printer.printCustom("Area      : ${scannedValue.value!["at"]}", 1, 0);
         printer.printCustom("Pelanggan : ${scannedValue.value!["pt"]}", 1, 0);
+
+        final String noTlp = scannedValue.value?['np']?.toString().trim() ?? '';
+        if (noTlp.isNotEmpty) {
+          printer.printCustom("No. Tlp   : $noTlp", 1, 0);
+        }
 
         printer.printNewLine();
 
         // QR Code
         // printer.printQRcode(rawValue.value, 200, 200, 1);
 
-
         final textLine1 = (scannedValue.value?['kp'] ?? 'LG').toString();
-        final hasGr = scannedValue.value?.containsKey('gr') ?? false;
-        final textLine2 = hasGr ? 'BM' : 'SA';
+        final bool hasWs = scannedValue.value?.containsKey('ws') ?? false;
+        final String textLine2 = hasWs ? 'BM' : 'SA';
+
 
         final qrBytes = await generateQrWithText(
           data: rawValue.value,

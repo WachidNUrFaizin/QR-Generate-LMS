@@ -72,19 +72,23 @@ class HomeView extends GetView<HomeController> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Table(
-                          columnWidths: const {
-                            0: IntrinsicColumnWidth(), // kolom label
-                            1: FixedColumnWidth(10),   // kolom titik dua
-                            2: FlexColumnWidth(),      // kolom isi
-                          },
-                          children: [
-                            _buildRow("ID Toko", "${controller.scannedValue.value!["it"]}"),
-                            _buildRow("Nama Toko", "${controller.scannedValue.value!["nt"]}"),
-                            _buildRow("Area Toko", "${controller.scannedValue.value!["at"]}"),
-                            _buildRow("Pelanggan Toko", "${controller.scannedValue.value!["pt"]}"),
-                          ],
-                        ),
+                        Builder(builder: (_) {
+                          final hp = controller.scannedValue.value?['np']?.toString().trim() ?? '';
+                          return Table(
+                            columnWidths: const {
+                              0: IntrinsicColumnWidth(),
+                              1: FixedColumnWidth(10),
+                              2: FlexColumnWidth(),
+                            },
+                            children: [
+                              _buildRow("ID Toko", "${controller.scannedValue.value!["it"]}"),
+                              _buildRow("Nama Toko", "${controller.scannedValue.value!["nt"]}"),
+                              _buildRow("Area Toko", "${controller.scannedValue.value!["at"]}"),
+                              _buildRow("Pelanggan Toko", "${controller.scannedValue.value!["pt"]}"),
+                              if (hp.isNotEmpty) _buildRow("No. Tlp", hp),
+                            ],
+                          );
+                        }),
                         const SizedBox(height: 24),
                         const Divider(),
                         const SizedBox(height: 12),
