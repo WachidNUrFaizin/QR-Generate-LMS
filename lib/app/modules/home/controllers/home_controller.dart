@@ -226,10 +226,18 @@ class HomeController extends GetxController {
                   for (final barcode in barcodes) {
                     var value = barcode.rawValue ?? "";
                     try {
-                      scannedValue.value = jsonDecode(value);
-                      if(scannedValue.value!.containsKey('it') && scannedValue.value!.containsKey('nt') && scannedValue.value!.containsKey('at') && scannedValue.value!.containsKey('pt')) {
-                        // valid
+                      final parsed = jsonDecode(value);
+
+                      if (parsed is Map<String, dynamic>
+                          && parsed.containsKey('it')
+                          && parsed.containsKey('nt')
+                          && parsed.containsKey('at')
+                          && parsed.containsKey('pt')) {
+                        parsed['kp'] = 'LG';
+
+                        scannedValue.value = parsed;
                         rawValue.value = value;
+
                         insertScanned(scannedValue.value);
                         print(rawValue);
                         print(scannedValue.value!['pt']);
@@ -350,11 +358,11 @@ class HomeController extends GetxController {
     required String textLine2,
     double qrSize = 150.0,          // ukuran QR
     double textWidth = 100.0,       // area teks utama
-    double timestampWidth = 120.0,  // area timestamp
-    double padding = 12.0,          // jarak antar elemen
+    double timestampWidth = 100.0,  // area timestamp
+    double padding = 8.0,          // jarak antar elemen
     double fontSize = 40.0,         // ukuran font teks utama
     double timeFontSize = 24.0,     // ukuran font jam
-    double dateFontSize = 24.0,     // ukuran font tanggal
+    double dateFontSize = 22.0,     // ukuran font tanggal
   }) async {
     // --- Buat timestamp sekarang ---
     final now = DateTime.now();
