@@ -42,6 +42,7 @@ class _RiwayatPageState extends State<RiwayatPage> {
   Future<void> _truncateData() async {
     try{
       final drop = await DatabaseHelper.instance.truncateTable();
+      await _loadRiwayat();
       print('Successfull Truncate');
     }catch(e){
       print('Error inserting scanned item: $e');
@@ -75,7 +76,23 @@ class _RiwayatPageState extends State<RiwayatPage> {
         backgroundColor: Color(0xFF913030),
         foregroundColor: Colors.white,
         elevation: 2,
-        actions: [if (scannedBarcodes.isNotEmpty) IconButton(icon: const Icon(Icons.delete_sweep), onPressed: () => _truncateData() , tooltip: 'Hapus Semua')],
+        actions: [if (scannedBarcodes.isNotEmpty) IconButton(icon: const Icon(Icons.delete_sweep), onPressed: () =>
+            showDialog(context: context, builder: (BuildContext context){
+              return AlertDialog(
+                title: Text('Konfirmasi'),
+                content: Text('Hapus semua riwayat scan ?'),
+                actions: [
+                  TextButton(onPressed: () => Navigator.pop(context), child: Text('Batal')),
+                  TextButton(onPressed: ()  async {
+                    Navigator.pop(context);
+                    await _truncateData();
+                    }, child: Text('Hapus'))
+                ],
+              );
+            })
+
+
+            , tooltip: 'Hapus Semua')],
       ),
       body: scannedBarcodes.isEmpty
           ? Center(
