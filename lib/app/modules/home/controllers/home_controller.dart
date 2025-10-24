@@ -328,7 +328,16 @@ class HomeController extends GetxController {
 
         final textLine1 = (scannedValue.value?['kp'] ?? 'LG').toString();
         final bool hasWs = scannedValue.value?.containsKey('ws') ?? false;
-        final String textLine2 = hasWs ? 'BM' : 'SA';
+        final textLine2 = (() {
+          final raw = scannedValue.value?['ws']?.toString();
+          if (raw == null || raw.trim().isEmpty) return 'SA';
+          final ws = raw.toUpperCase().trim().replaceAll(RegExp(r'\s+'), ' ');
+          if (ws == 'BT JKT') return 'BMJ';
+          if (ws == 'BT SBY') return 'BMS';
+          if (ws == 'BT SMG') return 'BM';
+          return 'BM';
+        })();
+
 
 
         final qrBytes = await generateQrWithText(
