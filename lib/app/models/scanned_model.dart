@@ -5,6 +5,9 @@ class ScannedItem {
   final String at;
   final String pt;
   final String date;
+  final String telp;
+  final String ws;
+
 
   ScannedItem({
     this.id,
@@ -12,7 +15,9 @@ class ScannedItem {
     required this.nt,
     required this.at,
     required this.pt,
-    required this.date
+    required this.date,
+    required this.telp,
+    required this.ws
   });
 
   Map<String, dynamic> toMap() {
@@ -22,7 +27,9 @@ class ScannedItem {
       'nt': nt,
       'at': at,
       'pt': pt,
-      'date': date
+      'date': date,
+      'telp': telp,
+      'ws': ws
     };
   }
 
@@ -33,7 +40,9 @@ class ScannedItem {
         nt: map['nt'],
         at: map['at'],
         pt: map['pt'],
-        date: map['date']
+        date: map['date'],
+        telp: map['telp'],
+        ws: map['ws']
     );
   }
 
@@ -41,7 +50,7 @@ class ScannedItem {
 
   @override
   String toString() {
-    return 'ScannedItem{id: $id, it: $it, nt: $nt, at: $at,date: $date}';
+    return 'ScannedItem{id: $id, it: $it, nt: $nt, at: $at,date: $date , telp: $telp, ws: $ws}';
   }
 
 }

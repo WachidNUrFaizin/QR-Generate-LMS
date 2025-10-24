@@ -94,7 +94,7 @@ class HomeView extends GetView<HomeController> {
                         const SizedBox(height: 12),
                         // Bagian QR Code
                         const Text(
-                          "QR Code Toko",
+                          "QR Code",
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 12),

@@ -47,6 +47,8 @@ class DatabaseHelper {
         nt $textType,
         at $textType,
         pt $textType,
+        telp $textType,
+        ws $textType,
         date $textType
       )
     ''');
@@ -64,6 +66,8 @@ class DatabaseHelper {
         nt $textType,
         at $textType,
         pt $textType,
+        telp $textType,
+        ws $textType,
         date $textType
       )
     ''');

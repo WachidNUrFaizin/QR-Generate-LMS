@@ -32,9 +32,9 @@ class HomeController extends GetxController {
 
     var device = box.read('bluetoothDevice');
     if (device != null) {
-      printer.isConnected.then( (result) {
+      printer.isConnected.then((result) {
         selectedDevice.value = BluetoothDevice(device['name'], device['address']);
-        if(result!) {
+        if (result!) {
           isConnect.value = true;
         } else {
           connectDevice(selectedDevice.value!);
@@ -290,21 +290,25 @@ class HomeController extends GetxController {
       ),
     );
   }
+
   Future<void> insertScanned(value) async {
     try {
       final scanned = ScannedItem(
-        it: value!["it"],
-        nt: value!["nt"],
-        at: value!["at"],
-        pt: value!["pt"],
-        date: DateTime.timestamp().toIso8601String(),
-      );
-      final id = await DatabaseHelper.instance.insertScanned(scanned);
-      print('ScannedItem inserted successfully with ID: $id');
+          it: value?["it"] ?? '',
+          nt: value?["nt"] ?? '',
+          at: value?["at"] ?? '',
+          pt: value?["pt"] ?? '',
+          ws: value?["ws"] ?? 'SA',
+          telp: value?["np"] ?? '',
+          date: DateTime.timestamp().toIso8601String()
+    ,);
+    final id = await DatabaseHelper.instance.insertScanned(scanned);
+    print('ScannedItem inserted successfully with ID: $id');
     } catch (e) {
-      print('Error inserting scanned item: $e');
+    print('Error inserting scanned item: $e');
     }
   }
+
   Future<void> printTicket() async {
     printer.isConnected.then((isConnected) async {
       if (isConnected == true) {
@@ -330,14 +334,15 @@ class HomeController extends GetxController {
         final bool hasWs = scannedValue.value?.containsKey('ws') ?? false;
         final textLine2 = (() {
           final raw = scannedValue.value?['ws']?.toString();
-          if (raw == null || raw.trim().isEmpty) return 'SA';
+          if (raw == null || raw
+              .trim()
+              .isEmpty) return 'SA';
           final ws = raw.toUpperCase().trim().replaceAll(RegExp(r'\s+'), ' ');
           if (ws == 'BT JKT') return 'BMJ';
           if (ws == 'BT SBY') return 'BMS';
           if (ws == 'BT SMG') return 'BM';
           return 'BM';
         })();
-
 
 
         final qrBytes = await generateQrWithText(
@@ -353,7 +358,6 @@ class HomeController extends GetxController {
         printer.printNewLine();
         printer.printNewLine();
         printer.printNewLine();
-
       } else {
         bottomSheetConnectDevice();
       }
@@ -365,13 +369,13 @@ class HomeController extends GetxController {
     required String data,
     required String textLine1,
     required String textLine2,
-    double qrSize = 150.0,          // ukuran QR
-    double textWidth = 100.0,       // area teks utama
-    double timestampWidth = 100.0,  // area timestamp
-    double padding = 8.0,          // jarak antar elemen
-    double fontSize = 40.0,         // ukuran font teks utama
-    double timeFontSize = 24.0,     // ukuran font jam
-    double dateFontSize = 22.0,     // ukuran font tanggal
+    double qrSize = 150.0, // ukuran QR
+    double textWidth = 100.0, // area teks utama
+    double timestampWidth = 100.0, // area timestamp
+    double padding = 8.0, // jarak antar elemen
+    double fontSize = 40.0, // ukuran font teks utama
+    double timeFontSize = 24.0, // ukuran font jam
+    double dateFontSize = 22.0, // ukuran font tanggal
   }) async {
     // --- Buat timestamp sekarang ---
     final now = DateTime.now();
@@ -387,7 +391,8 @@ class HomeController extends GetxController {
     final canvas = Canvas(recorder);
 
     // Background putih
-    final bgPaint = Paint()..color = Colors.white;
+    final bgPaint = Paint()
+      ..color = Colors.white;
     canvas.drawRect(
       Rect.fromLTWH(0, 0, totalWidth.toDouble(), totalHeight.toDouble()),
       bgPaint,

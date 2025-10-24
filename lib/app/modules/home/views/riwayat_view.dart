@@ -134,8 +134,18 @@ class _RiwayatPageState extends State<RiwayatPage> {
                     const SizedBox(height: 1),
                     Text('${barcode.pt}', style: TextStyle(color: Colors.grey[700], fontSize: 13)),
                   ],
+                  if (barcode.telp != null && barcode.telp.isNotEmpty) ...[
+                    const SizedBox(height: 1),
+                    Text(
+                      barcode.telp,
+                      style: TextStyle(color: Colors.grey[700], fontSize: 13),
+                    ),
+                  ],
+                  const SizedBox(height: 1),
+                  Text(barcode.ws, style: TextStyle(color: Colors.grey[700], fontSize: 13)),
                   const SizedBox(height: 1),
                   Text( _formatTimestamp(barcode.date), style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+
                 ],
               ),
             ),
