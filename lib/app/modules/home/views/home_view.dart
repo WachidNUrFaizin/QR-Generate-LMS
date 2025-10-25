@@ -74,6 +74,8 @@ class HomeView extends GetView<HomeController> {
                       children: [
                         Builder(builder: (_) {
                           final hp = controller.scannedValue.value?['np']?.toString().trim() ?? '';
+                          final wsRaw = controller.scannedValue.value?['ws']?.toString() ?? '';
+                          final grossir = wsRaw.trim().isEmpty ? 'SA' : wsRaw.trim();
                           return Table(
                             columnWidths: const {
                               0: IntrinsicColumnWidth(),
@@ -85,6 +87,7 @@ class HomeView extends GetView<HomeController> {
                               _buildRow("Nama Toko", "${controller.scannedValue.value!["nt"]}"),
                               _buildRow("Area Toko", "${controller.scannedValue.value!["at"]}"),
                               _buildRow("Pelanggan Toko", "${controller.scannedValue.value!["pt"]}"),
+                              _buildRow("Grosir", grossir),
                               if (hp.isNotEmpty) _buildRow("No. Tlp", hp),
                             ],
                           );
