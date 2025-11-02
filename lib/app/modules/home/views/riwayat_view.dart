@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:lms_qr_generator/app/helper/scanned_helper.dart';
 import 'package:lms_qr_generator/app/models/scanned_model.dart';
-
+import 'package:lms_qr_generator/app/modules/home/controllers/home_controller.dart';
 
 
 
@@ -29,6 +29,34 @@ class _RiwayatPageState extends State<RiwayatPage> {
     setState(() {
       scannedBarcodes = data;
     });
+  }
+
+  Future<void> _confirmPrint(ScannedItem item) async {
+    final controller = Get.isRegistered<HomeController>()
+        ? Get.find<HomeController>()
+        : Get.put(HomeController());
+    return showDialog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Konfirmasi'),
+          content: const Text('Cetak ulang QR untuk riwayat ini?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Batal'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                await controller.printTicket(item: item);
+              },
+              child: const Text('Cetak'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   // void _loadDummyData() {
@@ -146,7 +174,14 @@ class _RiwayatPageState extends State<RiwayatPage> {
                   const SizedBox(height: 1),
                   Text( _formatTimestamp(barcode.date), style: TextStyle(color: Colors.grey[600], fontSize: 12)),
 
+
                 ],
+              ),
+              trailing: IconButton(
+                icon: const Icon(Icons.print),
+                color: const Color(0xFF913030),
+                tooltip: 'Cetak ulang',
+                onPressed: () => _confirmPrint(barcode),
               ),
             ),
           );

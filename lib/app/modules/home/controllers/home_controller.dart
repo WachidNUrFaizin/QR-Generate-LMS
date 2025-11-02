@@ -309,18 +309,39 @@ class HomeController extends GetxController {
     }
   }
 
-  Future<void> printTicket() async {
+  Future<void> printTicket({ScannedItem? item}) async {
     printer.isConnected.then((isConnected) async {
       if (isConnected == true) {
+
+        final Map<String, dynamic>? dataMap = item != null
+            ? {
+          'it': item.it,
+          'nt': item.nt,
+          'at': item.at,
+          'pt': item.pt,
+          'ws': item.ws,
+          'np': item.telp,
+          'kp': 'LG',
+        }
+            : scannedValue.value;
+
+        if (dataMap == null) {
+          Get.snackbar("Gagal", "Data scan tidak ditemukan", backgroundColor: Colors.red, colorText: Colors.white);
+          return;
+        }
+
+        final qrData = item != null ? jsonEncode(dataMap) : rawValue.value;
+
+
         printer.printCustom("ID CUSTOMER", 2, 1);
         printer.printNewLine();
 
-        printer.printCustom("ID        : ${scannedValue.value!["it"]}", 1, 0);
-        printer.printCustom("Nama      : ${scannedValue.value!["nt"]}", 1, 0);
-        printer.printCustom("Area      : ${scannedValue.value!["at"]}", 1, 0);
-        printer.printCustom("Pelanggan : ${scannedValue.value!["pt"]}", 1, 0);
+        printer.printCustom("ID        : ${dataMap["it"]}", 1, 0);
+        printer.printCustom("Nama      : ${dataMap["nt"]}", 1, 0);
+        printer.printCustom("Area      : ${dataMap["at"]}", 1, 0);
+        printer.printCustom("Pelanggan : ${dataMap["pt"]}", 1, 0);
 
-        final String noTlp = scannedValue.value?['np']?.toString().trim() ?? '';
+        final String noTlp = (dataMap['np'] ?? dataMap['telp'] ?? '').toString().trim();
         if (noTlp.isNotEmpty) {
           printer.printCustom("No. Tlp   : $noTlp", 1, 0);
         }
@@ -330,10 +351,9 @@ class HomeController extends GetxController {
         // QR Code
         // printer.printQRcode(rawValue.value, 200, 200, 1);
 
-        final textLine1 = (scannedValue.value?['kp'] ?? 'LG').toString();
-        final bool hasWs = scannedValue.value?.containsKey('ws') ?? false;
+        final textLine1 = (dataMap['kp'] ?? 'LG').toString();
         final textLine2 = (() {
-          final raw = scannedValue.value?['ws']?.toString();
+          final raw = dataMap['ws']?.toString();
           if (raw == null || raw
               .trim()
               .isEmpty) return 'SA';
@@ -346,7 +366,7 @@ class HomeController extends GetxController {
 
 
         final qrBytes = await generateQrWithText(
-          data: rawValue.value,
+          data: qrData,
           textLine1: textLine1,
           textLine2: textLine2,
           qrSize: 150,
