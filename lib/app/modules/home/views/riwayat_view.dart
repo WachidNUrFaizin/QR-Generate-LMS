@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lms_qr_generator/app/helper/scanned_helper.dart';
@@ -17,6 +18,29 @@ class _RiwayatPageState extends State<RiwayatPage> {
   // List untuk menyimpan hasil scan
   List<ScannedItem> scannedBarcodes = [];
 
+  bool _showingDummyData = false;
+
+  static const List<Map<String, String>> _rawDummyHistory = [
+    {
+      'it': 'J00070',
+      'nt': 'ALIM SALES',
+      'at': 'JAKARTA',
+      'pt': '',
+      'kp': '',
+      'ws': 'BT JKT',
+      'np': '08129439216',
+    },
+    {
+      'it': 'J02290',
+      'nt': 'Ponti Suri 2',
+      'at': 'Pontianak',
+      'pt': 'JKT Alex',
+      'kp': '',
+      'ws': 'BT JKT',
+      'np': '0812345678',
+    },
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -26,8 +50,11 @@ class _RiwayatPageState extends State<RiwayatPage> {
 
   Future<void> _loadRiwayat() async {
     final data = await DatabaseHelper.instance.getRiwayatScan();
+    final shouldUseDummy = kDebugMode && data.isEmpty;
+    final items = shouldUseDummy ? _buildDummyHistory() : data;
     setState(() {
-      scannedBarcodes = data;
+      scannedBarcodes = items;
+      _showingDummyData = shouldUseDummy;
     });
   }
 
@@ -57,6 +84,26 @@ class _RiwayatPageState extends State<RiwayatPage> {
         );
       },
     );
+  }
+
+  List<ScannedItem> _buildDummyHistory() {
+    final now = DateTime.now();
+
+    return _rawDummyHistory.asMap().entries.map((entry) {
+      final index = entry.key;
+      final map = entry.value;
+      final timestamp = now.subtract(Duration(minutes: (index + 1) * 5));
+
+      return ScannedItem(
+        it: map['it'] ?? '-',
+        nt: map['nt'] ?? '-',
+        at: map['at'] ?? '-',
+        pt: map['pt'] ?? '',
+        date: timestamp.toIso8601String(),
+        telp: map['np'] ?? '',
+        ws: map['ws'] ?? '',
+      );
+    }).toList();
   }
 
   // void _loadDummyData() {
@@ -136,56 +183,74 @@ class _RiwayatPageState extends State<RiwayatPage> {
           ],
         ),
       )
-          :
-
-      ListView.builder(
-        itemCount: scannedBarcodes.length,
-        padding: const EdgeInsets.all(8),
-        itemBuilder: (context, index) {
-          final barcode = scannedBarcodes[index];
-          return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            elevation: 2,
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              leading: CircleAvatar(
-                backgroundColor: Color(0xFF913030),
-                child: Icon(Icons.qr_code_2, color: Colors.white),
+          : Column(
+          children: [
+          if (_showingDummyData)
+      Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F5F5),
+        borderRadius: BorderRadius.circular(12),
               ),
-              title: Text(barcode.it, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 2),
-                  Text('${barcode.nt} - ${barcode.at}', style: TextStyle(color: Colors.grey[700], fontSize: 13)),
-                  if (barcode.pt != null && barcode.pt.isNotEmpty)...[
-                    const SizedBox(height: 1),
-                    Text('${barcode.pt}', style: TextStyle(color: Colors.grey[700], fontSize: 13)),
-                  ],
-                  if (barcode.telp != null && barcode.telp.isNotEmpty) ...[
-                    const SizedBox(height: 1),
-                    Text(
-                      barcode.telp,
-                      style: TextStyle(color: Colors.grey[700], fontSize: 13),
-                    ),
-                  ],
-                  const SizedBox(height: 1),
-                  Text(barcode.ws, style: TextStyle(color: Colors.grey[700], fontSize: 13)),
-                  const SizedBox(height: 1),
-                  Text( _formatTimestamp(barcode.date), style: TextStyle(color: Colors.grey[600], fontSize: 12)),
-
-
-                ],
-              ),
-              trailing: IconButton(
-                icon: const Icon(Icons.print),
-                color: const Color(0xFF913030),
-                tooltip: 'Cetak ulang',
-                onPressed: () => _confirmPrint(barcode),
+      child: const Text(
+        'Menampilkan data dummy untuk pengujian. Data ini hanya tersedia saat development.',
+        style: TextStyle(fontSize: 13),
               ),
             ),
-          );
-        },
+
+            Expanded(
+              child: ListView.builder(
+                itemCount: scannedBarcodes.length,
+                padding: const EdgeInsets.all(8),
+                itemBuilder: (context, index) {
+                  final barcode = scannedBarcodes[index];
+                  return Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    elevation: 2,
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      leading: const CircleAvatar(
+                        backgroundColor: Color(0xFF913030),
+                        child: Icon(Icons.qr_code_2, color: Colors.white),
+                      ),
+                      title: Text(barcode.it, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 2),
+                          Text('${barcode.nt} - ${barcode.at}', style: TextStyle(color: Colors.grey[700], fontSize: 13)),
+                          if (barcode.pt.isNotEmpty) ...[
+                            const SizedBox(height: 1),
+                            Text(barcode.pt, style: TextStyle(color: Colors.grey[700], fontSize: 13)),
+                          ],
+                          if (barcode.telp.isNotEmpty) ...[
+                            const SizedBox(height: 1),
+                            Text(
+                              barcode.telp,
+                              style: TextStyle(color: Colors.grey[700], fontSize: 13),
+                            ),
+                          ],
+                          const SizedBox(height: 1),
+                          Text(barcode.ws, style: TextStyle(color: Colors.grey[700], fontSize: 13)),
+                          const SizedBox(height: 1),
+                          Text(_formatTimestamp(barcode.date), style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                        ],
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.print),
+                        color: const Color(0xFF913030),
+                        tooltip: 'Cetak ulang',
+                        onPressed: () => _confirmPrint(barcode),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+
       ),
     );
   }
