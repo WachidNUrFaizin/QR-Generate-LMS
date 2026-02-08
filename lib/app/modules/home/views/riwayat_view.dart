@@ -18,28 +18,28 @@ class _RiwayatPageState extends State<RiwayatPage> {
   // List untuk menyimpan hasil scan
   List<ScannedItem> scannedBarcodes = [];
 
-  bool _showingDummyData = false;
+ //  bool _showingDummyData = false;
 
-  static const List<Map<String, String>> _rawDummyHistory = [
-    {
-      'it': 'J00070',
-      'nt': 'ALIM SALES',
-      'at': 'JAKARTA',
-      'pt': '',
-      'kp': '',
-      'ws': 'BT JKT',
-      'np': '08129439216',
-    },
-    {
-      'it': 'J02290',
-      'nt': 'Ponti Suri 2',
-      'at': 'Pontianak',
-      'pt': 'JKT Alex',
-      'kp': '',
-      'ws': 'BT JKT',
-      'np': '0812345678',
-    },
-  ];
+  // static const List<Map<String, String>> _rawDummyHistory = [
+  //   {
+  //     'it': 'J00070',
+  //     'nt': 'ALIM SALES',
+  //     'at': 'JAKARTA',
+  //     'pt': '',
+  //     'kp': '',
+  //     'ws': 'BT JKT',
+  //     'np': '08129439216',
+  //   },
+  //   {
+  //     'it': 'J02290',
+  //     'nt': 'Ponti Suri 2',
+  //     'at': 'Pontianak',
+  //     'pt': 'JKT Alex',
+  //     'kp': '',
+  //     'ws': 'BT JKT',
+  //     'np': '0812345678',
+  //   },
+  // ];
 
   @override
   void initState() {
@@ -50,11 +50,12 @@ class _RiwayatPageState extends State<RiwayatPage> {
 
   Future<void> _loadRiwayat() async {
     final data = await DatabaseHelper.instance.getRiwayatScan();
-    final shouldUseDummy = kDebugMode && data.isEmpty;
-    final items = shouldUseDummy ? _buildDummyHistory() : data;
+    // final shouldUseDummy = kDebugMode && data.isEmpty;
+    // final items = shouldUseDummy ? _buildDummyHistory() : data;
     setState(() {
-      scannedBarcodes = items;
-      _showingDummyData = shouldUseDummy;
+     // scannedBarcodes = items;
+      scannedBarcodes = data;
+    //  _showingDummyData = shouldUseDummy;
     });
   }
 
@@ -86,25 +87,25 @@ class _RiwayatPageState extends State<RiwayatPage> {
     );
   }
 
-  List<ScannedItem> _buildDummyHistory() {
-    final now = DateTime.now();
-
-    return _rawDummyHistory.asMap().entries.map((entry) {
-      final index = entry.key;
-      final map = entry.value;
-      final timestamp = now.subtract(Duration(minutes: (index + 1) * 5));
-
-      return ScannedItem(
-        it: map['it'] ?? '-',
-        nt: map['nt'] ?? '-',
-        at: map['at'] ?? '-',
-        pt: map['pt'] ?? '',
-        date: timestamp.toIso8601String(),
-        telp: map['np'] ?? '',
-        ws: map['ws'] ?? '',
-      );
-    }).toList();
-  }
+  // List<ScannedItem> _buildDummyHistory() {
+  //   final now = DateTime.now();
+  //
+  //   return _rawDummyHistory.asMap().entries.map((entry) {
+  //     final index = entry.key;
+  //     final map = entry.value;
+  //     final timestamp = now.subtract(Duration(minutes: (index + 1) * 5));
+  //
+  //     return ScannedItem(
+  //       it: map['it'] ?? '-',
+  //       nt: map['nt'] ?? '-',
+  //       at: map['at'] ?? '-',
+  //       pt: map['pt'] ?? '',
+  //       date: timestamp.toIso8601String(),
+  //       telp: map['np'] ?? '',
+  //       ws: map['ws'] ?? '',
+  //     );
+  //   }).toList();
+  // }
 
   // void _loadDummyData() {
   //   scannedBarcodes = [
@@ -185,20 +186,20 @@ class _RiwayatPageState extends State<RiwayatPage> {
       )
           : Column(
           children: [
-          if (_showingDummyData)
-      Container(
-      width: double.infinity,
-      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
-        borderRadius: BorderRadius.circular(12),
-              ),
-      child: const Text(
-        'Menampilkan data dummy untuk pengujian. Data ini hanya tersedia saat development.',
-        style: TextStyle(fontSize: 13),
-              ),
-            ),
+      //     if (_showingDummyData)
+      // Container(
+      // width: double.infinity,
+      // margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      // padding: const EdgeInsets.all(12),
+      // decoration: BoxDecoration(
+      //   color: const Color(0xFFF5F5F5),
+      //   borderRadius: BorderRadius.circular(12),
+      //         ),
+      // child: const Text(
+      //   'Menampilkan data dummy untuk pengujian. Data ini hanya tersedia saat development.',
+      //   style: TextStyle(fontSize: 13),
+      //         ),
+      //       ),
 
             Expanded(
               child: ListView.builder(

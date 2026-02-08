@@ -1,4 +1,7 @@
 import 'package:lms_qr_generator/app/models/scanned_model.dart';
+import 'dart:io';
+
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -15,14 +18,23 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDB(String filePath) async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, filePath);
+    final path = await _resolveDatabasePath(filePath);
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _createDB,
+      onUpgrade: _upgradeDB,
     );
+  }
+
+  Future<String> _resolveDatabasePath(String filePath) async {
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      final directory = await getApplicationDocumentsDirectory();
+      return join(directory.path, filePath);
+    }
+    final dbPath = await getDatabasesPath();
+    return join(dbPath, filePath);
   }
 
   Future<void>  dropTable() async {
@@ -71,6 +83,38 @@ class DatabaseHelper {
         date $textType
       )
     ''');
+
+    await db.execute('''
+      CREATE TABLE customers (
+        id $idType,
+        it $textType,
+        nt $textType,
+        at $textType,
+        pt $textType,
+        ws $textType,
+        np $textType,
+        created_at $textType
+      )
+    ''');
+  }
+
+  Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
+      const textType = 'TEXT';
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS customers (
+          id $idType,
+          it $textType,
+          nt $textType,
+          at $textType,
+          pt $textType,
+          ws $textType,
+          np $textType,
+          created_at $textType
+        )
+      ''');
+    }
   }
 
   // Insert user
@@ -84,6 +128,31 @@ class DatabaseHelper {
     final db = await instance.database;
     final result = await db.query('scanned_log', orderBy: 'id DESC');
     return result.map((map) => ScannedItem.fromMap(map)).toList();
+  }
+
+  Future<int> insertCustomer(Map<String, dynamic> customer) async {
+    final db = await instance.database;
+    return await db.insert('customers', customer);
+  }
+
+  Future<int> updateCustomer(Map<String, dynamic> customer) async {
+    final db = await instance.database;
+    return await db.update(
+      'customers',
+      customer,
+      where: 'id = ?',
+      whereArgs: [customer['id']],
+    );
+  }
+
+  Future<int> deleteCustomer(int id) async {
+    final db = await instance.database;
+    return await db.delete('customers', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<List<Map<String, dynamic>>> getCustomers() async {
+    final db = await instance.database;
+    return await db.query('customers', orderBy: 'id DESC');
   }
 
 
